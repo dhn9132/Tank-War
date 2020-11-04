@@ -7,11 +7,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class TankFrame extends Frame {
-    int x=200,y=200;
-    Dir dir=Dir.DOWN;
+    private Tank myTank;
+    private Tank enemyTank;
+    Dir dir;
     //tank速度
     final int SPEED=10;
     public TankFrame() throws HeadlessException {
+        myTank=new Tank(100,100,Dir.LEFT);
+        enemyTank=new Tank(200,200,Dir.DOWN);
         setSize(800,600);
         setTitle("Tank War");
         setResizable(false);
@@ -29,85 +32,26 @@ public class TankFrame extends Frame {
 
     @Override
     public void paint(Graphics g) {
-        //tank的位置、大小
-        g.fillRect(x,y,50,50);
-        //x+=10;
-//        y+=10;
-        switch (dir){
-            case UP:
-                y-=SPEED;
-                break;
-            case RIGHT:
-                x+=SPEED;
-                break;
-            case LEFT:
-                x-=SPEED;
-                break;
-            case DOWN:
-                y+=SPEED;
-                break;
-            default:
-                break;
-        }
+        myTank.paint(g);
+        enemyTank.paint(g);
     }
 
     class MyKeyListener extends KeyAdapter{
-        Boolean bL=false;
-        Boolean bU=false;
-        Boolean bR=false;
-        Boolean bD=false;
+
         @Override
         public void keyPressed(KeyEvent e) {
-            int keyCode = e.getKeyCode();
-            switch (keyCode){
-                case KeyEvent.VK_LEFT:
-                    bL=true;
-                    break;
-                case KeyEvent.VK_RIGHT:
-                    bR=true;
-                    break;
-                case KeyEvent.VK_UP:
-                    bU=true;
-                    break;
-                case KeyEvent.VK_DOWN:
-                    bD=true;
-                    break;
-                default:
-                    break;
-            }
-            setMainTankDir();
+            myTank.keyPressed(e);
 
-//            x+=200;
-//            repaint();
         }
+
+
 
         @Override
         public void keyReleased(KeyEvent e) {
-            int keyCode = e.getKeyCode();
-            switch (keyCode){
-                case KeyEvent.VK_LEFT:
-                    bL=true;
-                    break;
-                case KeyEvent.VK_RIGHT:
-                    bR=true;
-                    break;
-                case KeyEvent.VK_UP:
-                    bU=true;
-                    break;
-                case KeyEvent.VK_DOWN:
-                    bD=true;
-                    break;
-                default:
-                    break;
-            }
-            setMainTankDir();
+            myTank.keyReleased(e);
         }
 
         private void setMainTankDir() {
-            if(bL) dir=Dir.LEFT;
-            if(bR) dir=Dir.RIGHT;
-            if(bU) dir=Dir.UP;
-            if(bD) dir=Dir.DOWN;
 
         }
     }
