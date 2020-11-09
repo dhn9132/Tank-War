@@ -1,14 +1,7 @@
 package com.dhnsoft.tank;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.awt.print.Book;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Random;
 
 /**
  * @Description
@@ -17,25 +10,21 @@ import java.util.Random;
  * @date 2020.11.03 22:57
  */
 //抽象坦克类
-public class Tank {
-    private boolean moving=true;
+public class Player {
+    private boolean moving=false;
     private int x,y;
     private Dir dir;
-    public static final int SPEED=5;
+    public static final int SPEED=10;
     private boolean bL,bR,bU,bD;
     private Group group;
     private Boolean live=true;
-    private int oldX,oldY;
 
 
-    public Tank(int x, int y,Dir dir,Group group) {
+    public Player(int x, int y, Dir dir, Group group) {
         this.x = x;
         this.y = y;
         this.dir=dir;
         this.group=group;
-
-        oldX=x;
-        oldY=y;
     }
 
     public Boolean isLive() {
@@ -62,20 +51,13 @@ public class Tank {
         this.y = y;
     }
 
-    public Group getGroup() {
-        return group;
-    }
-
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
     //画坦克
     public void paint(Graphics g) {
         //如果不活着就不画坦克
         if(!this.isLive()){
             return;
         }
+        if(this.group==Group.GOOD){
             switch (dir){
                 case LEFT:
                     g.drawImage(ResourceMgr.goodTankL,x,y,null);
@@ -90,6 +72,23 @@ public class Tank {
                     g.drawImage(ResourceMgr.goodTankD,x,y,null);
                     break;
             }
+        }
+        if(this.group==Group.BAD){
+            switch (dir){
+                case LEFT:
+                    g.drawImage(ResourceMgr.badTankL,x,y,null);
+                    break;
+                case RIGHT:
+                    g.drawImage(ResourceMgr.badTankR,x,y,null);
+                    break;
+                case UP:
+                    g.drawImage(ResourceMgr.badTankU,x,y,null);
+                    break;
+                case DOWN:
+                    g.drawImage(ResourceMgr.badTankD,x,y,null);
+                    break;
+            }
+        }
         move();
     }
     //键盘按下事件
@@ -143,9 +142,6 @@ public class Tank {
         if(!moving){
             return;
         }
-        oldX=x;
-        oldY=y;
-
         switch (dir){
             case LEFT:
                 x-=SPEED;
@@ -160,36 +156,34 @@ public class Tank {
                 y+=SPEED;
                 break;
         }
-        boundCheck();
-        randomDir();
-        if(r.nextInt(100)>90){
-            fire();
-        }
-    }
-    //碰到了边界就掉头
-    private void boundCheck() {
-        if(x<0||y<30||x>TankFrame.GAME_WIDTH||y>TankFrame.GAME_HEIGHT){
-            this.back();
-        }
     }
 
-    private void back() {
-        this.oldX=x;
-        this.oldY=y;
-    }
 
-    private  Random r=new Random();
-    private void randomDir() {
-        if(r.nextInt(100)>90){
-            this.dir=Dir.randomDir();
+
+    public void keyReleased(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        switch (keyCode){
+            case KeyEvent.VK_LEFT:
+                bL=false;
+                break;
+            case KeyEvent.VK_RIGHT:
+                bR=false;
+                break;
+            case KeyEvent.VK_UP:
+                bU=false;
+                break;
+            case KeyEvent.VK_DOWN:
+                bD=false;
+                break;
+            case KeyEvent.VK_SPACE:
+                fire();
+                break;
         }
+        setMainDir();
     }
-
 
     private void fire() {
         TankFrame.INSTANCE.add(new Bullet(x+15,y+15,dir,group));
-
-
     }
     public void die(){
         this.setLive(false);
